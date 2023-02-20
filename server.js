@@ -66,8 +66,95 @@ function determineResponse (response) {
             init();
             })
     }
+    else if(response.firstquestion === "Add a department") {
+            addDepartment();
+            }
+    else if (response.firstquestion === "Add a role") {
+        addRole();
+    }
+    else if (response.firstquestion === "Add an employee") {
+        addEmployee();
+    }
     else if(response.firstquestion === "Quit") {
             console.log("Bye!");
             return;
             }
-    }
+    
+function addDepartment () {
+    const deptQuestion = [
+        {
+            type: "input",
+            message: "Enter department name:",
+            name: "deptname"
+        }
+    ]
+    inquirer.prompt(deptQuestion).then((response) => {
+        console.log(response.deptname);
+        db.query(`INSERT INTO department (name) VALUES ('${response.deptname})'`, function(err, results) {
+        // unable to console.log the results
+            // console.table(results);
+        })
+        init();
+})
+}}
+
+function addRole () {
+    const roleQuestions = [
+        {
+            type: "input",
+            message: "Enter role name:",
+            name: "rolename"
+        },
+        {
+            type: "input",
+            message: "Enter salary:",
+            name: "salary"
+        },
+        {
+            type: "input",
+            message: "Enter department ID:",
+            name: "deptid"
+        }
+    ]
+    inquirer.prompt(roleQuestions).then((response) => {
+        console.log(response.rolename);
+        db.query(`INSERT INTO role (title, salary, department_ID) VALUES ('${response.rolename}', '${response.salary})', '${response.deptid}`, function(err, results) {
+        // unable to console.log the results
+            // console.table(results);
+        })
+        init();
+})
+}
+
+function addEmployee () {
+    const employeeQuestions = [
+        {
+            type: "input",
+            message: "Enter employee first name:",
+            name: "firstname"
+        },
+        {
+            type: "input",
+            message: "Enter employee last name:",
+            name: "lastname"
+        },
+        {
+            type: "input",
+            message: "Enter role ID:",
+            name: "roleid"
+        },
+        {
+            type: "input",
+            message: "Enter employee's manager ID:",
+            name: "mgrid"
+        }
+    ]
+    inquirer.prompt(employeeQuestions).then((response) => {
+        console.log(response.rolename);
+        db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${response.firstname}', '${response.lastname})', '${response.roleid}', '${response.mgrid}'`, function(err, results) {
+        // unable to console.log the results
+            // console.table(results);
+        })
+        init();
+})
+}
