@@ -92,7 +92,7 @@ function addDepartment () {
         }
     ]
     inquirer.prompt(deptQuestion).then((response) => {
-        db.query(`INSERT INTO department (name) VALUES ${response.deptname}`, function(err, results) {
+        db.query(`INSERT INTO department (name) VALUES (?)`, response.deptname, function(err, results) {
             console.log("code working");
             console.log(`${response.deptname} added to the database.`);
             init();
