@@ -14,13 +14,15 @@ VALUES ("IT Analyst", 100000, 1),
         ("Marketing Specialist", 65000, 4),
         ("Sales Representative", 80000, 5),
         ("Human Resources Manager", 60000, 6),
-        ("Customer Service Rep", 75000, 7);
+        ("Customer Service Rep", 75000, 7),
+        ("IT Manager", 125000, 1);
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ("Sarah", "Smith", 1, 1),
+VALUES ("Sarah", "Smith", 1, 8),
         ("Joe", "Shmoe", 2, 2),
         ("Stanley", "Yelnats", 3, 3),
         ("Hector", "Zeroni", 4, 4),
         ("Kathryn", "Barlow", 5, 5),
         ("Marion", "Sevillo", 6, 6),
-        ("Rex", "Washburn", 7, 7);
+        ("Rex", "Washburn", 7, 7),
+        ("Katniss", "Everdeen", 8, 8);

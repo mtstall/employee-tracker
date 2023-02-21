@@ -57,11 +57,12 @@ function determineResponse (response) {
             })
     }
     else if(response.firstquestion === "View all employees") {
-        // COME BACK TO THIS - NEED TO ADD MGR NAME
-            db.query(`SELECT employee.id, employee.first_name, employee.last_name, role.title, role.salary, department.name, employee.manager_id
-            FROM employee
-            JOIN role ON role.id = employee.role_id
-            JOIN department ON role.department_id = department.id`, function(err, results) {
+            db.query(`SELECT a.id, a.first_name, a.last_name, role.title, department.name AS "department_name", department.id AS "department_id", role.salary, CONCAT(b.first_name," ",b.last_name) AS "manager_name"
+            FROM employee AS a
+            INNER JOIN employee AS b
+            ON b.id = a.manager_id
+            JOIN role ON role.id = a.role_id
+            JOIN department ON department.id = role.department_id`, function(err, results) {
             console.table(results);
             init();
             })
@@ -75,10 +76,14 @@ function determineResponse (response) {
     else if (response.firstquestion === "Add an employee") {
         addEmployee();
     }
+    else if (response.firstquestion === "Update an employee role") {
+        updateEmployeeRole();
+    }
     else if(response.firstquestion === "Quit") {
             console.log("Bye!");
             return;
-            }
+    }
+}
     
 function addDepartment () {
     const deptQuestion = [
@@ -89,14 +94,13 @@ function addDepartment () {
         }
     ]
     inquirer.prompt(deptQuestion).then((response) => {
-        console.log(response.deptname);
-        db.query(`INSERT INTO department (name) VALUES ('${response.deptname})'`, function(err, results) {
+        db.query(`INSERT INTO department (name) VALUES (?)`, response.deptname, function(err, results) {
         // unable to console.log the results
-            // console.table(results);
+            console.log(`${response.deptname} added to the database.`);
+            init();
         })
-        init();
 })
-}}
+}
 
 function addRole () {
     const roleQuestions = [
@@ -117,12 +121,12 @@ function addRole () {
         }
     ]
     inquirer.prompt(roleQuestions).then((response) => {
-        console.log(response.rolename);
+        // QUESTION: HOW DO I MAKE A LIST BASED OFF EXISTING DEPARTMENTS
         db.query(`INSERT INTO role (title, salary, department_ID) VALUES ('${response.rolename}', '${response.salary})', '${response.deptid}`, function(err, results) {
         // unable to console.log the results
-            // console.table(results);
-        })
+        console.log(`${response.rolename} added to the database.`);
         init();
+        })
 })
 }
 
@@ -150,11 +154,31 @@ function addEmployee () {
         }
     ]
     inquirer.prompt(employeeQuestions).then((response) => {
-        console.log(response.rolename);
+        db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${response.firstname}', '${response.lastname})', '${response.roleid}', '${response.mgrid}'`, function(err, results) {
+        console.log(`${response.firstname} ${response.lastname} added to the database.`);
+        init();
+        })
+})
+}
+
+function updateEmployeeRole () {
+    const employeeRoleQuestions = [
+        {
+            type: "input",
+            message: "Enter ID of employee you'd like to update:",
+            name: "empid"
+        },
+        {
+            type: "input",
+            message: "What would you like to update their role to?",
+            name: "role"
+        }
+    ]
+    inquirer.prompt(employeeRoleQuestions).then((response) => {
+        //console.log(response.rolename);
         db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${response.firstname}', '${response.lastname})', '${response.roleid}', '${response.mgrid}'`, function(err, results) {
         // unable to console.log the results
             // console.table(results);
-        })
-        init();
-})
+        })}
+    )
 }
