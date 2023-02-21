@@ -12,9 +12,7 @@ const db = mysql.createConnection(
       // TODO: Add MySQL password
       password: '12345',
       database: 'employees_db'
-    },
-    console.log(`Connected to the employees_db database.`)
-  );
+    })
 
 // array of questions for user input
 const questions = [
@@ -94,13 +92,14 @@ function addDepartment () {
         }
     ]
     inquirer.prompt(deptQuestion).then((response) => {
-        db.query(`INSERT INTO department (name) VALUES (?)`, response.deptname, function(err, results) {
-        // unable to console.log the results
+        db.query(`INSERT INTO department (name) VALUES ${response.deptname}`, function(err, results) {
+            console.log("code working");
             console.log(`${response.deptname} added to the database.`);
             init();
         })
 })
 }
+
 
 function addRole () {
     const roleQuestions = [
@@ -115,19 +114,35 @@ function addRole () {
             name: "salary"
         },
         {
-            type: "input",
-            message: "Enter department ID:",
+            type: "list",
+            choices: {
+                name: "View all departments:"
+            },
             name: "deptid"
         }
     ]
     inquirer.prompt(roleQuestions).then((response) => {
         // QUESTION: HOW DO I MAKE A LIST BASED OFF EXISTING DEPARTMENTS
         db.query(`INSERT INTO role (title, salary, department_ID) VALUES ('${response.rolename}', '${response.salary})', '${response.deptid}`, function(err, results) {
-        // unable to console.log the results
         console.log(`${response.rolename} added to the database.`);
         init();
         })
 })
+}
+
+function dynamicList () {
+    const dynamicList = [
+        {
+            type: "dynamiclist",
+            message: "Choose department:",
+            choices: [
+                db.query(`SELECT * FROM department`, function(err, results) {
+                    console.table(results);
+                    })
+            ]
+
+        }
+    ]
 }
 
 function addEmployee () {
@@ -175,10 +190,12 @@ function updateEmployeeRole () {
         }
     ]
     inquirer.prompt(employeeRoleQuestions).then((response) => {
-        //console.log(response.rolename);
         db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${response.firstname}', '${response.lastname})', '${response.roleid}', '${response.mgrid}'`, function(err, results) {
-        // unable to console.log the results
             // console.table(results);
         })}
     )
 }
+
+        // QUESTION: HOW DO I MAKE A LIST BASED OFF EXISTING DEPARTMENTS
+        // HOW DO I UPDATE AN EMPLOYEE ROLE
+        // https://stackoverflow.com/questions/66626936/inquirer-js-populate-list-choices-from-sql-database
