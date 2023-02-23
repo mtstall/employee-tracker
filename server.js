@@ -144,6 +144,8 @@ async function generateDeptList() {
 async function addEmployee() {
     let roleList = await generateRoleList();
     console.log(roleList);
+    let managerList = await generateManagerList();
+    console.log(managerList);
   const employeeQuestions = [
     {
       type: "input",
@@ -162,8 +164,9 @@ async function addEmployee() {
       name: "roleid",
     },
     {
-      type: "input",
-      message: "Enter employee's manager ID:",
+      type: "list",
+      message: "Enter employee's manager:",
+      choices: managerList,
       name: "mgrid",
     },
   ];
@@ -187,6 +190,13 @@ async function generateRoleList() {
        return { name: element.title, value: element.id };
      });
  }
+
+ async function generateManagerList() {
+    let [managers] = await db.promise().query(`SELECT employee.id, CONCAT(employee.first_name," ",employee.last_name) AS "name" FROM employee`)
+    return managers.map((element, index, array) => {
+        return { name: element.name, value: element.id };
+      });
+}
 
 function updateEmployeeRole() {
   const employeeRoleQuestions = [
