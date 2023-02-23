@@ -116,6 +116,7 @@ async function addRole() {
     },
     {
       type: "list",
+      message: "Choose department:",
       choices: deptList,
       name: "deptid",
     },
@@ -140,7 +141,9 @@ async function generateDeptList() {
     });
 }
 
-function addEmployee() {
+async function addEmployee() {
+    let roleList = await generateRoleList();
+    console.log(roleList);
   const employeeQuestions = [
     {
       type: "input",
@@ -153,8 +156,9 @@ function addEmployee() {
       name: "lastname",
     },
     {
-      type: "input",
-      message: "Enter role ID:",
+      type: "list",
+      message: "Enter employee role:",
+      choices: roleList,
       name: "roleid",
     },
     {
@@ -175,6 +179,14 @@ function addEmployee() {
     );
   });
 }
+
+async function generateRoleList() {
+    let [roles] = await db.promise().query(`SELECT role.id, role.title FROM role`);
+    console.log(roles);
+    return roles.map((element, index, array) => {
+       return { name: element.title, value: element.id };
+     });
+ }
 
 function updateEmployeeRole() {
   const employeeRoleQuestions = [
