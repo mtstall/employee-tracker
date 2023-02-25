@@ -42,18 +42,18 @@ init();
 
 function determineResponse(response) {
   if (response.firstquestion === "View all departments") {
-    db.query(`SELECT * FROM department`, function (err, results) {
+    db.query(`SELECT department.id AS "dept_id", department.name AS "dept_name" FROM department`, function (err, results) {
       console.table(results);
       init();
     });
   } else if (response.firstquestion === "View all roles") {
-    db.query(`SELECT * FROM role`, function (err, results) {
+    db.query(`SELECT role.title AS "job_title", role.id AS "role_id", role.salary, role.department_id FROM role`, function (err, results) {
       console.table(results);
       init();
     });
   } else if (response.firstquestion === "View all employees") {
     db.query(
-      `SELECT a.id, a.first_name, a.last_name, role.title, department.name AS "department_name", department.id AS "department_id", role.salary, CONCAT(b.first_name," ",b.last_name) AS "manager_name"
+      `SELECT a.id, a.first_name, CONCAT(a.first_name," ",a.last_name) AS "employee_name", role.title, department.name AS "department_name", department.id AS "department_id", role.salary, CONCAT(b.first_name," ",b.last_name) AS "manager_name"
             FROM employee AS a
             INNER JOIN employee AS b
             ON b.id = a.manager_id
@@ -91,7 +91,6 @@ function addDepartment() {
       `INSERT INTO department (name) VALUES (?)`,
       response.deptname,
       function (err, results) {
-        console.log("code working");
         console.log(`${response.deptname} added to the database.`);
         init();
       }
@@ -101,7 +100,6 @@ function addDepartment() {
 
 async function addRole() {
     let deptList = await generateDeptList();
-    console.log(deptList);
 
   const roleQuestions = [
     {
@@ -135,7 +133,6 @@ async function addRole() {
 
 async function generateDeptList() {
    let [departments] = await db.promise().query(`SELECT * FROM department`);
-   console.log(departments);
    return departments.map((element, index, array) => {
       return { name: element.name, value: element.id };
     });
@@ -143,7 +140,6 @@ async function generateDeptList() {
 
 async function addEmployee() {
     let roleList = await generateRoleList();
-    console.log(roleList);
     let managerList = await generateManagerList();
     console.log(managerList);
   const employeeQuestions = [
@@ -185,7 +181,6 @@ async function addEmployee() {
 
 async function generateRoleList() {
     let [roles] = await db.promise().query(`SELECT role.id, role.title FROM role`);
-    console.log(roles);
     return roles.map((element, index, array) => {
        return { name: element.title, value: element.id };
      });
