@@ -15,4 +15,7 @@
 
 -- INSERT INTO department (name) VALUES ('Test Department')
 
-INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('Taylor', 'Stallings', '4', '1')
+-- INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('Taylor', 'Stallings', '4', '1')
+
+SELECT a.id, CONCAT(a.first_name," ",a.last_name) AS "employee_name", role.title, department.name AS "department_name", department.id AS "department_id", role.salary, CONCAT(b.first_name," ",b.last_name) AS "manager_name" WHERE employee.manager_id = ${response.mgrid}
+            FROM employee
