@@ -28,6 +28,8 @@ const questions = [
       { name: "Update an employee's manager"},
       { name: "View employees by manager"},
       { name: "View employees by department"},
+      { name: "Delete department"},
+      { name: "Delete role"},
       { name: "Quit" },
     ],
     message: "Select from the following:",
@@ -81,10 +83,58 @@ function determineResponse(response) {
     viewEmployeeByMgr();
   } else if (response.firstquestion === "View employees by department") {
     viewEmployeeByDept();
+  } else if (response.firstquestion === "Delete department") {
+    deleteDepartment();
+  } else if (response.firstquestion === "Delete role") {
+    deleteRole();
   } else if (response.firstquestion === "Quit") {
     console.log("Bye!");
     return;
   }
+}
+
+async function deleteDepartment () {
+    let deptList = await generateDeptList();
+
+    const deptQuestions = [
+        {
+          type: "list",
+          message: "Choose which department you'd like to delete:",
+          choices: deptList,
+          name: "deptid",
+        }
+      ];
+      inquirer.prompt(deptQuestions).then((response) => {
+        db.query(
+            `DELETE from department WHERE id = ${response.deptid}`,
+          function (err, results) {
+            console.log(`Department deleted.`);
+            init();
+          }
+        );
+      });
+}
+
+async function deleteRole () {
+    let roleList = await generateRoleList();
+
+    const roleQuestions = [
+        {
+          type: "list",
+          message: "Choose which role you'd like to delete:",
+          choices: roleList,
+          name: "roleid",
+        }
+      ];
+      inquirer.prompt(roleQuestions).then((response) => {
+        db.query(
+            `DELETE from role WHERE id = ${response.roleid}`,
+          function (err, results) {
+            console.log(`Role deleted.`);
+            init();
+          }
+        );
+      });
 }
 
 function addDepartment() {
@@ -130,7 +180,7 @@ async function addRole() {
   ];
   inquirer.prompt(roleQuestions).then((response) => {
     db.query(
-      `INSERT INTO role (title, salary, department_ID) VALUES ('${response.rolename}', '${response.salary})', '${response.deptid}`,
+      `INSERT INTO role (title, salary, department_id) VALUES ('${response.rolename}', '${response.salary}', '${response.deptid}')`,
       function (err, results) {
         console.log(`${response.rolename} added to the database.`);
         init();
