@@ -30,6 +30,7 @@ const questions = [
       { name: "View employees by department"},
       { name: "Delete department"},
       { name: "Delete role"},
+      { name: "Delete employee"},
       { name: "Quit" },
     ],
     message: "Select from the following:",
@@ -87,6 +88,8 @@ function determineResponse(response) {
     deleteDepartment();
   } else if (response.firstquestion === "Delete role") {
     deleteRole();
+  } else if (response.firstquestion === "Delete employee") {
+    deleteEmployee();
   } else if (response.firstquestion === "Quit") {
     console.log("Bye!");
     return;
@@ -131,6 +134,28 @@ async function deleteRole () {
             `DELETE from role WHERE id = ${response.roleid}`,
           function (err, results) {
             console.log(`Role deleted.`);
+            init();
+          }
+        );
+      });
+}
+
+async function deleteEmployee () {
+    let employeeList = await generateManagerList();
+
+    const employeeQuestions = [
+        {
+          type: "list",
+          message: "Choose which employee you'd like to delete:",
+          choices: employeeList,
+          name: "empid",
+        }
+      ];
+      inquirer.prompt(employeeQuestions).then((response) => {
+        db.query(
+            `DELETE from employee WHERE id = ${response.empid}`,
+          function (err, results) {
+            console.log(`Employee deleted.`);
             init();
           }
         );
@@ -226,7 +251,7 @@ async function addEmployee() {
   ];
   inquirer.prompt(employeeQuestions).then((response) => {
     db.query(
-      `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${response.firstname}', '${response.lastname}', '${response.roleid}', '${response.mgrid}'`,
+      `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${response.firstname}', '${response.lastname}', '${response.roleid}', '${response.mgrid}')`,
       function (err, results) {
         console.log(
           `${response.firstname} ${response.lastname} added to the database.`
