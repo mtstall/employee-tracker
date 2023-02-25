@@ -27,6 +27,7 @@ const questions = [
       { name: "Update an employee role" },
       { name: "Update an employee's manager"},
       { name: "View employees by manager"},
+      { name: "View employees by department"},
       { name: "Quit" },
     ],
     message: "Select from the following:",
@@ -78,6 +79,8 @@ function determineResponse(response) {
     updateEmployeeManager();
   } else if (response.firstquestion === "View employees by manager") {
     viewEmployeeByMgr();
+  } else if (response.firstquestion === "View employees by department") {
+    viewEmployeeByDept();
   } else if (response.firstquestion === "Quit") {
     console.log("Bye!");
     return;
@@ -274,8 +277,35 @@ async function viewEmployeeByMgr () {
             ON b.id = a.manager_id
             JOIN role ON role.id = a.role_id
             JOIN department ON department.id = role.department_id
-           WHERE a.manager_id = ${response.mgrid}`
-             ,
+           WHERE a.manager_id = ${response.mgrid}`,
+          function (err, results) {
+            console.table(results);
+            init();
+          }
+        );
+      });
+}
+
+async function viewEmployeeByDept () {
+    let deptList = await generateDeptList();
+
+    const deptQuestions = [
+        {
+          type: "list",
+          message: "Choose which department you'd like to view employees by:",
+          choices: deptList,
+          name: "deptid",
+        }
+      ];
+      inquirer.prompt(deptQuestions).then((response) => {
+        db.query(
+            `SELECT a.id, CONCAT(a.first_name," ",a.last_name) AS "employee_name", role.title, department.name AS "department_name", department.id AS "department_id", role.salary, CONCAT(b.first_name," ",b.last_name) AS "manager_name"
+            FROM employee AS a
+            INNER JOIN employee AS b
+            ON b.id = a.manager_id
+            JOIN role ON role.id = a.role_id
+            JOIN department ON department.id = role.department_id
+           WHERE department.id = ${response.deptid}`,
           function (err, results) {
             console.table(results);
             init();
