@@ -53,7 +53,7 @@ function determineResponse(response) {
     });
   } else if (response.firstquestion === "View all employees") {
     db.query(
-      `SELECT a.id, a.first_name, CONCAT(a.first_name," ",a.last_name) AS "employee_name", role.title, department.name AS "department_name", department.id AS "department_id", role.salary, CONCAT(b.first_name," ",b.last_name) AS "manager_name"
+      `SELECT a.id, CONCAT(a.first_name," ",a.last_name) AS "employee_name", role.title, department.name AS "department_name", department.id AS "department_id", role.salary, CONCAT(b.first_name," ",b.last_name) AS "manager_name"
             FROM employee AS a
             INNER JOIN employee AS b
             ON b.id = a.manager_id
@@ -141,7 +141,6 @@ async function generateDeptList() {
 async function addEmployee() {
     let roleList = await generateRoleList();
     let managerList = await generateManagerList();
-    console.log(managerList);
   const employeeQuestions = [
     {
       type: "input",
@@ -168,7 +167,7 @@ async function addEmployee() {
   ];
   inquirer.prompt(employeeQuestions).then((response) => {
     db.query(
-      `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${response.firstname}', '${response.lastname})', '${response.roleid}', '${response.mgrid}'`,
+      `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${response.firstname}', '${response.lastname}', '${response.roleid}', '${response.mgrid}'`,
       function (err, results) {
         console.log(
           `${response.firstname} ${response.lastname} added to the database.`
@@ -193,27 +192,31 @@ async function generateRoleList() {
       });
 }
 
-function updateEmployeeRole() {
-  const employeeRoleQuestions = [
+async function updateEmployeeRole() {
+  let employeeList = await generateManagerList();
+  let roleList = await generateRoleList();
+
+    const employeeRoleQuestions = [
     {
-      type: "input",
-      message: "Enter ID of employee you'd like to update:",
+      type: "list",
+      message: "Choose employee whose role you'd like to update:",
+      choices: employeeList,
       name: "empid",
     },
     {
-      type: "input",
+      type: "list",
       message: "What would you like to update their role to?",
+      choices: roleList,
       name: "role",
     },
   ];
   inquirer.prompt(employeeRoleQuestions).then((response) => {
     db.query(
-      `UPDATE employee SET (first_name, last_name, role_id, manager_id) VALUES ('${response.firstname}', '${response.lastname})', '${response.roleid}', '${response.mgrid}'`,
-      function (err, results) {}
+      `UPDATE employee SET employee.role_id = ${response.role} WHERE employee.id = ${response.empid}`,
+      function (err, results) {
+        console.log("Employee updated!")
+        init();
+      }
     );
   });
 }
-
-// QUESTION: HOW DO I MAKE A LIST BASED OFF EXISTING DEPARTMENTS
-// HOW DO I UPDATE AN EMPLOYEE ROLE
-// https://stackoverflow.com/questions/66626936/inquirer-js-populate-list-choices-from-sql-database

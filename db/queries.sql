@@ -13,4 +13,6 @@
 -- JOIN role ON role.id = a.role_id
 -- JOIN department ON department.id = role.department_id;
 
-INSERT INTO department (name) VALUES ('Test Department')
+-- INSERT INTO department (name) VALUES ('Test Department')
+
+INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('Taylor', 'Stallings', '4', '1')
