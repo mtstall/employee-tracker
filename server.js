@@ -311,7 +311,7 @@ async function updateEmployeeManager() {
     const employeeMgrQuestions = [
         {
           type: "list",
-          message: "Choose employee whose role you'd like to update:",
+          message: "Choose employee whose manager you'd like to update:",
           choices: employeeList,
           name: "empid",
         },
@@ -326,7 +326,7 @@ async function updateEmployeeManager() {
         db.query(
           `UPDATE employee SET employee.manager_id = ${response.mgrid} WHERE employee.id = ${response.empid}`,
           function (err, results) {
-            console.log("Employee updated!")
+            console.log(`Employee's manager updated.`);
             init();
           }
         );
